@@ -1,49 +1,106 @@
----
-id: environment-setup
-title: Get Started with React Native
-hide_table_of_contents: true
----
+val NavyBlue = Color(0xFF1A3A8E)
+val LightYellowBg = Color(0xFFFFFBEB)
+val BorderColor = Color(0xFFE2E8F0)
+val WarningText = Color(0xFFB45309)
+@Composable
+fun LaporanHarianScreen() {
+    val scrollState = rememberScrollState()
 
-import PlatformSupport from '@site/src/theme/PlatformSupport';
-import BoxLink from '@site/src/theme/BoxLink';
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF8FAFC)) // Background abu muda
+            .verticalScroll(scrollState)
+    ) {
+        // --- HEADER ---
+        HeaderSection()
 
-**React Native allows developers who know React to create native apps.** At the same time, native developers can use React Native to gain parity between native platforms by writing common features once.
+        Column(modifier = Modifier.padding(16.dp)) {
+            // --- INPUT JUMLAH & HADIR ---
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                CustomTextField(label = "Jumlah Personil", modifier = Modifier.weight(1f))
+                CustomTextField(label = "Hadir", modifier = Modifier.weight(1f))
+            }
 
-We believe that the best way to experience React Native is through a **Framework**, a toolbox with all the necessary APIs to let you build production ready apps.
+            Spacer(modifier = Modifier.height(16.dp))
 
-You can also use React Native without a Framework, however we’ve found that most developers benefit from using a React Native Framework like [Expo](https://expo.dev). Expo provides features like file-based routing, high-quality universal libraries, and the ability to write plugins that modify native code without having to manage native files.
+            // --- SECTION TIDAK HADIR (Kuning) ---
+            Card(
+                colors = CardDefaults.cardColors(containerColor = LightYellowBg),
+                border = BorderStroke(1.dp, Color(0xFFFFE4A0)),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("Tidak Hadir (Kurang)", fontWeight = FontWeight.Bold, color = WarningText)
+                        Text("0", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = WarningText)
+                    }
 
-<details>
-<summary>Can I use React Native without a Framework?</summary>
+                    Spacer(modifier = Modifier.height(12.dp))
 
-Yes. You can use React Native without a Framework. **However, if you’re building a new app with React Native, we recommend using a Framework.**
+                    // Grid untuk kategori absen
+                    val categories = listOf("Cuti", "Izin Biasa", "Izin Lisan", "Sakit", "Piket", "Lepas Piket", "TL", "BKO", "TK")
+                    
+                    // Menggunakan FlowRow agar otomatis pindah baris (perlu dependency foundation layout)
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        maxItemsInEachRow = 4,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        categories.forEach { label ->
+                            SmallInputBox(label)
+                        }
+                    }
+                }
+            }
 
-In short, you’ll be able to spend time writing your app instead of writing an entire Framework yourself in addition to your app.
+            Spacer(modifier = Modifier.height(16.dp))
 
-The React Native community has spent years refining approaches to navigation, accessing native APIs, dealing with native dependencies, and more. Most apps need these core features. A React Native Framework provides them from the start of your app.
+            // --- KETERANGAN ---
+            CustomTextField(
+                label = "Keterangan",
+                placeholder = "Contoh: BRIPDA John Doe - Sakit Demam",
+                isSingleLine = false,
+                modifier = Modifier.fillMaxWidth()
+            )
 
-Without a Framework, you’ll either have to write your own solutions to implement core features, or you’ll have to piece together a collection of pre-existing libraries to create a skeleton of a Framework. This takes real work, both when starting your app, then later when maintaining it.
+            Spacer(modifier = Modifier.height(16.dp))
 
-If your app has unusual constraints that are not served well by a Framework, or you prefer to solve these problems yourself, you can make a React Native app without a Framework using Android Studio, Xcode. If you’re interested in this path, learn how to [set up your environment](set-up-your-environment) and how to [get started without a framework](getting-started-without-a-framework).
+            // --- DROPDOWN KONDISI & CUACA ---
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                DropdownField(label = "Kondisi Lapangan", value = "Kondusif", modifier = Modifier.weight(1f))
+                DropdownField(label = "Cuaca", value = "Cerah", modifier = Modifier.weight(1f))
+            }
 
-</details>
+            Spacer(modifier = Modifier.height(16.dp))
 
-## Start a new React Native project with Expo
+            // --- UPLOAD FOTO ---
+            Text("Foto Dokumentasi (Wajib 2 Foto)", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                UploadBox("Foto 1", modifier = Modifier.weight(1f))
+                UploadBox("Foto 2", modifier = Modifier.weight(1f))
+            }
 
-<PlatformSupport platforms={['android', 'ios', 'tv', 'web']} />
+            Spacer(modifier = Modifier.height(24.dp))
 
-Expo is a production-grade React Native Framework. Expo provides developer tooling that makes developing apps easier, such as file-based routing, a standard library of native modules, and much more.
-
-Expo's Framework is free and open source, with an active community on [GitHub](https://github.com/expo) and [Discord](https://chat.expo.dev). The Expo team works in close collaboration with the React Native team at Meta to bring the latest React Native features to the Expo SDK.
-
-The team at Expo also provides Expo Application Services (EAS), an optional set of services that complements Expo, the Framework, in each step of the development process.
-
-To create a new Expo project, run the following in your terminal:
-
-```shell
-npx create-expo-app@latest
-```
-
-Once you’ve created your app, check out the rest of Expo’s getting started guide to start developing your app.
-
-<BoxLink href="https://docs.expo.dev/get-started/set-up-your-environment">Continue with Expo</BoxLink>
+            // --- TOMBOL KIRIM ---
+            Button(
+                onClick = { /* Handle Kirim */ },
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = NavyBlue)
+            ) {
+                Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("KIRIM LAPORAN HARIAN", fontWeight = FontWeight.Bold)
+            }
+            
+            Spacer(modifier = Modifier.height(50.dp))
+        }
+    }
+}
